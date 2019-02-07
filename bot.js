@@ -5,6 +5,7 @@ const Handlers = require('./Handlers.js').Handlers;
 const NodeHandlerArgs = require('./NodeHandlerArgs.js').NodeHandlerArgs;
 
 const IS_DEBUG = false;
+const COMMAND_PREFIX = '!';
 
 // Configure logger settings
 logger.remove(logger.transports.Console);
@@ -45,49 +46,52 @@ bot.on('ready', function (evt) {
 
 bot.on('message', function (user, userId, channelId, message, evt) {
 	// Our bot needs to know if it will execute a command
-	// It will listen for messages that will start with `!`
-	if (message.substring(0, 1) == '!') {
-		var args = message.substring(1).split(' ');
-		var cmd = args[0].toLowerCase();
+	if (message.substring(0, COMMAND_PREFIX.length) !== COMMAND_PREFIX) {
+		return;
+	}
 
-		args = args.splice(1);
-		var data = {
-			'user': user,
-			'userId': userId,
-			'channelId': channelId,
-			'evt': evt
-		};
+	var args = message.substring(1).split(' ');
+	var cmd = args[0].toLowerCase();
 
-		function handle_request(cmd, data, args) {
-			var handlers = handle_dict[cmd];
-			if (typeof(handlers) === "undefined") {
-				logger.info('[UNHANDLED] Received a command "' + cmd + '" from ' + data.user);
-				return;
-			}
+	args = args.splice(1);
+	var data = {
+		'user': user,
+		'userId': userId,
+		'channelId': channelId,
+		'evt': evt
+	};
 
-			logger.info('[HANDLED] Handling a command "' + cmd + '" from ' + data.user);
-			var results = [];
-			var node_args = new NodeHandlerArgs(bot, logger, data, cmd);
-			for (var key in handlers) {
-				var handler = handlers[key];
-				var response = handler.handle(node_args, args);
-				results.push(response);
-			}
-			function handle_result(channelId, result) {
-				if (Array.isArray(result)) {
-					for (var key in result) {
-						var item = result[key];
-						handle_result(channelId, item);
-					}
+	function handle_request(cmd, data, args) {
+		var handlers = handle_dict[cmd];
+		if (typeof(handlers) === "undefined") {
+			logger.info('[UNHANDLED] Received a command "' + cmd + '" from ' + data.user);
+			return;
+		}
+
+		logger.info('[HANDLED] Handling a command "' + cmd + '" from ' + data.user);
+		var results = [];
+		var node_args = new NodeHandlerArgs(bot, logger, data, cmd);
+		for (var key in handlers) {
+			var handler = handlers[key];
+			var response = handler.handle(node_args, args);
+			results.push(response);
+		}
+		function handle_result(channelId, result) {
+			if (Array.isArray(result)) {
+				for (var key in result) {
+					var item = result[key];
+					handle_result(channelId, item);
 				}
-				else if (typeof(result) == typeof('')) {
-					 // Single message
-					 bot.sendMessage({
-						to: channelId,
-						message: result
-					});
-				}
-				else if (typeof(result) === typeof({}) && typeof(result.target) !== 'undefined') {
+			}
+			else if (typeof(result) == typeof('')) {
+				 // Single message
+				 bot.sendMessage({
+					to: channelId,
+					message: result
+				});
+			}
+			else if (result != null) {
+				if (typeof(result) === typeof({}) && typeof(result.target) !== 'undefined') {
 					// An object with target/message
 					bot.sendMessage({
 						to: result.target,
@@ -100,22 +104,22 @@ bot.on('message', function (user, userId, channelId, message, evt) {
 					throw new Error('Only strings, arrays, objects of {target, message}, or combinations are supported');
 				}
 			}
-			handle_result(data.channelId, results);
 		}
+		handle_result(data.channelId, results);
+	}
 
-		if (IS_DEBUG) {
-			try {
-				handle_request(cmd, data, args);
-			}
-			catch (err) {
-				bot.sendMessage({
-					to: channelId,
-					message: 'FATAL BOT ERROR (' + err.name + '): ' + err.message
-				});
-			}
-		}
-		else {
+	if (IS_DEBUG) {
+		try {
 			handle_request(cmd, data, args);
 		}
+		catch (err) {
+			bot.sendMessage({
+				to: channelId,
+				message: 'FATAL BOT ERROR (' + err.name + '): ' + err.message
+			});
+		}
+	}
+	else {
+		handle_request(cmd, data, args);
 	}
 });
