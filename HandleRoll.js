@@ -27,10 +27,10 @@ class RollArgument {
 }
 
 class RollResult {
-	constructor(value, modifier, request) {
+	constructor(value, request) {
 		this._value = value;
-		this._modifier = modifier;
-		this._request = request;
+		this._modifier = request.modifier;
+		this._max = request.max;
 	}
 
 	get has_modifier() { return this._modifier != 0; }
@@ -38,7 +38,7 @@ class RollResult {
 	get modifier_as_string() { return Modifier.to_string(this._modifier); }
 	get value() { return this._value; }
 	get final_value() { return this._value + this._modifier; }
-	get request() { return this._request; }
+	get max() { return this._max; }
 }
 
 class RollResults {
@@ -66,7 +66,7 @@ function collect_rolls(rolls) {
 		if (roll.constructor != RollArgument) throw new Error('Must all be RollArguments');
 		
 		var physicalRoll = Util.ranged_random(1, roll.max);
-		collection.add(new RollResult(physicalRoll, roll.modifier, roll));
+		collection.add(new RollResult(physicalRoll, roll));
 	}
 
 	return collection;
@@ -74,7 +74,7 @@ function collect_rolls(rolls) {
 
 function format_rolls(target, collection) {
 	var dice = collection.dice;
-	var result = 'Rolled ' + collection.count + 'd' + dice[0].request.max + ': [Scores: ';
+	var result = 'Rolled ' + collection.count + 'd' + dice[0].max + ': [Scores: ';
 	var any = false;
 	for (var key in dice) {
 		var die = dice[key];
