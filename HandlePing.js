@@ -3,10 +3,10 @@ const NodeHandler = require('./NodeHandler.js').NodeHandler;
 
 exports.HandlePing = class extends NodeHandler {
 	constructor() {
-		super("ping");
+		super('ping');
 	}
 
 	handle(data, args) {
-		return "Pong!";
+		return 'Pong!';
 	}
 };

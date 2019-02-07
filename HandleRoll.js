@@ -114,7 +114,7 @@ function roll(target, rolls) {
 
 exports.HandleRoll = class extends NodeHandler {
 	constructor() {
-		super("roll");
+		super('roll');
 	}
 
 	handle(data, args) {

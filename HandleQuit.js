@@ -3,7 +3,7 @@ const NodeHandler = require('./NodeHandler.js').NodeHandler;
 
 exports.HandleQuit = class extends NodeHandler {
 	constructor() {
-		super(["dc", "disconnect", "quit", "exit"]);
+		super(['dc', 'disconnect', 'quit', 'exit']);
 	}
 
 	handle(data, args) {

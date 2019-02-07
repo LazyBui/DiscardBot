@@ -21,7 +21,7 @@ for (var key in Handlers) {
 	for (var cmd_key in cmds) {
 		var cmd = cmds[cmd_key];
 		var existing = handle_dict[cmd];
-		if (typeof(existing) !== "undefined") {
+		if (typeof(existing) !== 'undefined') {
 			logger.info('Warning, command "' + cmd + '" is handled by multiple handlers, ordering may be important');
 			existing.push(handler);
 		}
@@ -63,7 +63,7 @@ bot.on('message', function (user, userId, channelId, message, evt) {
 
 	function handle_request(cmd, data, args) {
 		var handlers = handle_dict[cmd];
-		if (typeof(handlers) === "undefined") {
+		if (typeof(handlers) === 'undefined') {
 			logger.info('[UNHANDLED] Received a command "' + cmd + '" from ' + data.user);
 			return;
 		}
@@ -98,7 +98,7 @@ bot.on('message', function (user, userId, channelId, message, evt) {
 						message: result.message
 					});
 				}
-				else if (typeof(result) !== "undefined") {
+				else if (typeof(result) !== 'undefined') {
 					// We have something confusing
 					logger.info('typeof(result) = ' + typeof(result));
 					throw new Error('Only strings, arrays, objects of {target, message}, or combinations are supported');
