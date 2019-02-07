@@ -125,15 +125,13 @@ exports.HandleRoll = class extends ChatHandler {
 		var quantity = null;
 		var sides = null;
 		try {
-			quantity = Util.get_integer(args[0]);
-			if (quantity < 1) throw new Error('Must be 1 or greater');
+			quantity = Util.get_integer(args[0], {min: 1});
 		}
 		catch (e) {
 			return 'INVALID QUANTITY: ' + args[0];
 		}
 		try {
-			sides = Util.get_integer(args[1]);
-			if (sides <= 1) throw new Error('Must be 2 or greater');
+			sides = Util.get_integer(args[1], {min: 2});
 		}
 		catch {
 			return 'INVALID SIDES: ' + args[1];
