@@ -129,7 +129,6 @@ exports.HandleRoll = class extends NodeHandler {
 			if (quantity < 1) throw new Error('Must be 1 or greater');
 		}
 		catch (e) {
-			data.logger.info('EXCEPTION: ' + e.message);
 			return 'INVALID QUANTITY: ' + args[0];
 		}
 		try {
