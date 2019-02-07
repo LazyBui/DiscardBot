@@ -1,13 +1,13 @@
 # DiscardBot
-A basic Discord bot shell
+A basic Discord bot shell.
 
 # Installation commands
-You'll need to execute the following commands to get this running
+You'll need to execute the following commands to get this running. The ordering is important.
 
-* `npm install https://github.com/woor/discord.io/tarball/gateway_v6`
 * `npm install discord.io winston -save`
+* `npm install https://github.com/woor/discord.io/tarball/gateway_v6`
 * `npm install fs`
 * `npm install path`
 
 # Token
-You'll also need to copy your Discord bot token to `token.txt`
+You'll also need to copy your Discord bot token to `token.txt`.
