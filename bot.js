@@ -4,15 +4,14 @@ const auth = require('./auth.js');
 const Handlers = require('./Handlers.js').Handlers;
 const NodeHandlerArgs = require('./NodeHandlerArgs.js').NodeHandlerArgs;
 
-const IS_DEBUG = false;
-const COMMAND_PREFIX = '!';
+const config = require('./config.js');
 
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console, {
-	colorize: true
+	colorize: config.colorize_logs
 });
-logger.level = 'debug';
+logger.level = config.log_level;
 
 handle_dict = {};
 for (var key in Handlers) {
@@ -46,11 +45,11 @@ bot.on('ready', function (evt) {
 
 bot.on('message', function (user, userId, channelId, message, evt) {
 	// Our bot needs to know if it will execute a command
-	if (message.substring(0, COMMAND_PREFIX.length) !== COMMAND_PREFIX) {
+	if (message.substring(0, config.prefix.length) !== config.prefix) {
 		return;
 	}
 
-	var args = message.substring(1).split(' ');
+	var args = message.substring(config.prefix.length).split(' ');
 	var cmd = args[0].toLowerCase();
 
 	args = args.splice(1);
@@ -70,7 +69,7 @@ bot.on('message', function (user, userId, channelId, message, evt) {
 
 		logger.info('[HANDLED] Handling a command "' + cmd + '" from ' + data.user);
 		var results = [];
-		var node_args = new NodeHandlerArgs(bot, logger, data, cmd);
+		var node_args = new NodeHandlerArgs(bot, logger, data, cmd, config);
 		for (var key in handlers) {
 			var handler = handlers[key];
 			var response = handler.handle(node_args, args);
@@ -108,7 +107,7 @@ bot.on('message', function (user, userId, channelId, message, evt) {
 		handle_result(data.channelId, results);
 	}
 
-	if (IS_DEBUG) {
+	if (config.debug) {
 		try {
 			handle_request(cmd, data, args);
 		}
