@@ -1,5 +1,5 @@
 var exports = module.exports = {};
-const NodeHandler = require('./NodeHandler.js').NodeHandler;
+const ChatHandler = require('./ChatHandler.js').ChatHandler;
 const Util = require('./Util.js').Util;
 
 class Modifier {
@@ -112,7 +112,7 @@ function roll(target, rolls) {
 	return format_rolls(target, collect_rolls(rolls));
 }
 
-exports.HandleRoll = class extends NodeHandler {
+exports.HandleRoll = class extends ChatHandler {
 	constructor() {
 		super('roll');
 	}

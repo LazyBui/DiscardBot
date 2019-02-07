@@ -2,7 +2,7 @@ const discord = require('discord.io');
 const logger = require('winston');
 const auth = require('./auth.js');
 const Handlers = require('./Handlers.js').Handlers;
-const NodeHandlerArgs = require('./NodeHandlerArgs.js').NodeHandlerArgs;
+const ChatHandlerArgs = require('./ChatHandlerArgs.js').ChatHandlerArgs;
 
 const config = require('./config.js');
 
@@ -69,10 +69,10 @@ bot.on('message', function (user, userId, channelId, message, evt) {
 
 		logger.info('[HANDLED] Handling a command "' + cmd + '" from ' + data.user);
 		var results = [];
-		var node_args = new NodeHandlerArgs(bot, logger, data, cmd, config);
+		var chat_args = new ChatHandlerArgs(bot, logger, data, cmd, config);
 		for (var key in handlers) {
 			var handler = handlers[key];
-			var response = handler.handle(node_args, args);
+			var response = handler.handle(chat_args, args);
 			results.push(response);
 		}
 		function handle_result(channelId, result) {

@@ -1,7 +1,7 @@
 var exports = module.exports = {};
-const NodeHandler = require('./NodeHandler.js').NodeHandler;
+const ChatHandler = require('./ChatHandler.js').ChatHandler;
 
-exports.HandlePing = class extends NodeHandler {
+exports.HandlePing = class extends ChatHandler {
 	constructor() {
 		super('ping');
 	}
