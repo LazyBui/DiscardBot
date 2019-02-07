@@ -1,5 +1,5 @@
 # DiscardBot
-A basic Discord bot shell.
+A basic Discord bot shell. Written for Node 10.15.1. May not be compatible with other versions of Node.
 
 # Installation commands
 You'll need to execute the following commands in the source directory to get this set up. The ordering is important.
