@@ -1,6 +1,6 @@
 var exports = module.exports = {};
-var NodeHandler = require('./NodeHandler.js').NodeHandler;
-var Util = require('./Util.js').Util;
+const NodeHandler = require('./NodeHandler.js').NodeHandler;
+const Util = require('./Util.js').Util;
 
 class Modifier {
 	static to_string(modifier) {

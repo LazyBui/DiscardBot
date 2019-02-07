@@ -1,8 +1,8 @@
-var discord = require('discord.io');
-var logger = require('winston');
-var auth = require('./auth.json');
-var Handlers = require('./Handlers.js').Handlers;
-var NodeHandlerArgs = require('./NodeHandlerArgs.js').NodeHandlerArgs;
+const discord = require('discord.io');
+const logger = require('winston');
+const auth = require('./auth.js');
+const Handlers = require('./Handlers.js').Handlers;
+const NodeHandlerArgs = require('./NodeHandlerArgs.js').NodeHandlerArgs;
 
 const IS_DEBUG = false;
 
@@ -35,6 +35,7 @@ var bot = new discord.Client({
 	token: auth.token,
 	autorun: true
 });
+
 bot.on('ready', function (evt) {
 	logger.info('Connected');
 	logger.info('Logged in as: ');

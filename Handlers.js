@@ -1,10 +1,10 @@
 var exports = module.exports = {};
-var HandleRoll = require('./HandleRoll.js');
-var HandleQuit = require('./HandleQuit.js');
-var HandlePing = require('./HandlePing.js');
+var HandleRoll = require('./HandleRoll.js').HandleRoll;
+var HandleQuit = require('./HandleQuit.js').HandleQuit;
+var HandlePing = require('./HandlePing.js').HandlePing;
 
 exports.Handlers = [
-	new HandleRoll.HandleRoll(),
-	new HandleQuit.HandleQuit(),
-	new HandlePing.HandlePing(),
+	new HandleRoll(),
+	new HandleQuit(),
+	new HandlePing(),
 ];

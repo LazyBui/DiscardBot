@@ -6,6 +6,8 @@
 	"author": "Your Name",
 	"dependencies": {
 		"discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
+		"fs": "0.0.1-security",
+		"path": "^0.12.7",
 		"winston": "^3.2.1"
 	}
 }
