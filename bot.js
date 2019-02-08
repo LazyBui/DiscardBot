@@ -107,18 +107,26 @@ bot.on('message', function (user, userId, channelId, message, evt) {
 		handle_result(data.channelId, results);
 	}
 
-	if (config.debug) {
+	if (config.allow_crashing) {
+		handle_request(cmd, data, args);
+	}
+	else {
 		try {
 			handle_request(cmd, data, args);
 		}
 		catch (err) {
-			bot.sendMessage({
-				to: channelId,
-				message: 'FATAL BOT ERROR (' + err.name + '): ' + err.message
-			});
+			if (config.send_crash_error_detail_to_channel) {
+				bot.sendMessage({
+					to: channelId,
+					message: 'FATAL BOT ERROR (' + err.name + '): ' + err.message
+				});
+			}
+			else {
+				bot.sendMessage({
+					to: channelId,
+					message: 'A fatal error occurred with the command, please contact the maintainer of the bot'
+				});
+			}
 		}
-	}
-	else {
-		handle_request(cmd, data, args);
 	}
 });
