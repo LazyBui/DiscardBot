@@ -1,6 +1,6 @@
 var exports = module.exports = {};
 
-exports.ChatHandlerArgs = class {
+class ChatHandlerArgs {
 	constructor(bot, logger, event_data, cmd, config) {
 		this._bot = bot;
 		this._logger = logger;
@@ -15,3 +15,5 @@ exports.ChatHandlerArgs = class {
 	get cmd() { return this._cmd; }
 	get config() { return this._config; }
 };
+
+exports.ChatHandlerArgs = ChatHandlerArgs;

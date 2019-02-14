@@ -1,6 +1,7 @@
 var exports = module.exports = {};
 
-exports.Util = class {
+class Util {
+	static get newline() { return '\r\n'; }
 	static bold(txt) { return '**' + txt + '**'; }
 	static italic(txt) { return '*' + txt + '*'; }
 	static strikethrough(txt) { return '~~' + txt + '~~'; }
@@ -22,4 +23,66 @@ exports.Util = class {
 		}
 		return result;
 	}
+	static inspect_object(obj, indent) {
+		if (!indent) indent = 0;
+		if (obj == null) return 'null';
+		if (typeof(obj) === 'undefined') return 'undefined';
+
+		var result = '\t'.repeat(indent);
+		for (var val in obj) {
+			if (result.length > 0) result += Util.newline;
+			result += '\t'.repeat(indent);
+			var t = typeof(obj[val]);
+			var v = obj[val];
+
+			if (!obj.hasOwnProperty(val)) result += '[i] ';
+			try {
+				v = v.toString();
+				result += 'prop "' + val + '" - type "' + t + '" - val "' + v + '"'; 
+			}
+			catch {
+				result += 'prop "' + val + '" - type "' + t + '" - val N/A';
+			}
+		}
+		Object.getOwnPropertyNames(obj).forEach(function (val, idx, array) {
+		});
+		return result;
+	}
+	static inspect_type(obj, indent) {
+		if (!indent) indent = 0;
+		if (obj == null) return 'null';
+		if (typeof(obj) === 'undefined') return 'undefined';
+		if (typeof(obj) !== 'object') return 'NOT OBJECT';
+		var proto = obj.prototype ? obj.prototype : obj.constructor.prototype;
+		var str = (obj.prototype ? obj.prototype.constructor.name : obj.constructor.name).toString();
+		var result = '\t'.repeat(indent) + 'Prototype: ' + str + Util.newline;
+		Object.getOwnPropertyNames(proto).forEach(function (val, idx, array) {
+			if (result.length > 0) result += Util.newline;
+			result += '\t'.repeat(indent);
+			var t = typeof(obj[val]);
+			var v = obj[val];
+			try {
+				if (val == 'constructor') {
+					var split = v.toString().split('{');
+					for (var key in split) {
+						var elem = split[key].trim();
+						if (!elem.startsWith('constructor')) continue;
+						var constructorLength = 'constructor'.length;
+						v = 'args: ' + elem.substring(constructorLength + 1, elem.length - 1);
+						break;
+					}
+				}
+				else {
+					v = v.toString();
+				}
+				result += 'prop "' + val + '" - type "' + t + '" - val "' + v + '"'; 
+			}
+			catch {
+				result += 'prop "' + val + '" - type "' + t + '" - val N/A';
+			}
+		});
+		return result;
+	}
 };
+
+exports.Util = Util;

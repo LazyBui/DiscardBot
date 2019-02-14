@@ -1,6 +1,6 @@
 var exports = module.exports = {};
 
-exports.ChatHandler = class {
+class ChatHandler {
 	constructor(cmds) {
 		if (new.target === exports.ChatHandler) throw new Error('Cannot instantiate a ChatHandler directly');
 		if (typeof(this.handle) !== 'function') throw new Error('Must implement a two-argument function called handle');
@@ -23,3 +23,5 @@ exports.ChatHandler = class {
 
 	get cmds() { return this._cmds.slice(); }
 };
+
+exports.ChatHandler = ChatHandler;

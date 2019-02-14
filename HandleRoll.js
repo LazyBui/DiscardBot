@@ -112,7 +112,7 @@ function roll(target, rolls) {
 	return format_rolls(target, collect_rolls(rolls));
 }
 
-exports.HandleRoll = class extends ChatHandler {
+class HandleRoll extends ChatHandler {
 	constructor() {
 		super('roll');
 	}
@@ -212,3 +212,5 @@ exports.HandleRoll = class extends ChatHandler {
 		return roll(target, rolls);
 	}
 };
+
+exports.HandleRoll = HandleRoll;

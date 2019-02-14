@@ -1,7 +1,7 @@
 var exports = module.exports = {};
 const ChatHandler = require('./ChatHandler.js').ChatHandler;
 
-exports.HandleQuit = class extends ChatHandler {
+class HandleQuit extends ChatHandler {
 	constructor() {
 		super(['dc', 'disconnect', 'quit', 'exit']);
 	}
@@ -11,3 +11,5 @@ exports.HandleQuit = class extends ChatHandler {
 		return null;
 	}
 };
+
+exports.HandleQuit = HandleQuit;
