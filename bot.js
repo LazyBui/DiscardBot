@@ -1,17 +1,42 @@
-const discord = require('discord.io');
-const logger = require('winston');
+const discord = require('discord.js');
+const {transports, createLogger, format} = require('winston');
 const auth = require('./auth.js');
 const Handlers = require('./Handlers.js').Handlers;
 const ChatHandlerArgs = require('./ChatHandlerArgs.js').ChatHandlerArgs;
+const TargetedMessage = require('./TargetedMessage.js').TargetedMessage;
+const Util = require('./Util.js').Util;
 
 const config = require('./config.js');
 
 // Configure logger settings
-logger.remove(logger.transports.Console);
-logger.add(new logger.transports.Console, {
-	colorize: config.colorize_logs
+const logger = createLogger({
+	format: format.combine(
+		format.timestamp({
+			format: function() {
+				// Explicitly get local time here
+				var v = new Date();
+				var pad = function (input, padChar, padLength) {
+					while (input.length < padLength) input = padChar + input;
+					return input;
+				};
+				var d = pad(v.getDate().toString(), '0', 2);
+				var h = pad(v.getHours().toString(), '0', 2);
+				var m = pad(v.getMinutes().toString(), '0', 2);
+				var s = pad(v.getSeconds().toString(), '0', 2);
+				var f = pad(v.getMilliseconds().toString(), '0', 3);
+				return d + '-' + h + ':' + m + ':' + s + '.' + f;
+			}
+		}),
+		format.json()
+	),
+	transports: [
+		new transports.Console({
+			colorize: config.colorize_logs,
+			level: config.log_level,
+		}),
+		//new transports.File({filename: 'logs/error.log', level: 'error'}),
+	]
 });
-logger.level = config.log_level;
 
 handle_dict = {};
 for (var key in Handlers) {
@@ -30,26 +55,27 @@ for (var key in Handlers) {
 	}
 }
 
-// Initialize discord Bot
-var bot = new discord.Client({
-	token: auth.token,
-	autorun: true
-});
+var bot = new discord.Client();
 
 bot.on('ready', function (evt) {
-	logger.info('Connected');
-	logger.info('Logged in as: ');
-	logger.info(bot.username + ' - (' + bot.id + ')');
+	logger.info('Connected, logged in as: ' + bot.user.username + ' - (' + bot.user.id + ')');
 	logger.info('Handling ' + Object.keys(handle_dict).length + ' distinct commands');
 });
 
-bot.on('message', function (user, userId, channelId, message, evt) {
+bot.on('message', function (message) {
+	var user = message.author;
+	var userId = user.id;
+	var channelId = message.channel.id;
+	var content = message.content;
 	// Our bot needs to know if it will execute a command
-	if (message.substring(0, config.prefix.length) !== config.prefix) {
+	if (content.substring(0, config.prefix.length) !== config.prefix) {
+		return;
+	}
+	if (user.equals(bot.user)) {
 		return;
 	}
 
-	var args = message.substring(config.prefix.length).split(' ');
+	var args = content.substring(config.prefix.length).split(' ');
 	var cmd = args[0].toLowerCase();
 
 	args = args.splice(1);
@@ -57,17 +83,18 @@ bot.on('message', function (user, userId, channelId, message, evt) {
 		'user': user,
 		'userId': userId,
 		'channelId': channelId,
-		'evt': evt
+		'evt': message
 	};
 
 	function handle_request(cmd, data, args) {
 		var handlers = handle_dict[cmd];
+		const command_string = 'a command "' + cmd + '" from ' + data.user.username + ' (' + data.user.id + ')';
 		if (typeof(handlers) === 'undefined') {
-			logger.info('[UNHANDLED] Received a command "' + cmd + '" from ' + data.user);
+			logger.info('[UNHANDLED] Received ' + command_string);
 			return;
 		}
 
-		logger.info('[HANDLED] Handling a command "' + cmd + '" from ' + data.user);
+		logger.info('[HANDLED] Handling ' + command_string);
 		var results = [];
 		var chat_args = new ChatHandlerArgs(bot, logger, data, cmd, config);
 		for (var key in handlers) {
@@ -75,36 +102,42 @@ bot.on('message', function (user, userId, channelId, message, evt) {
 			var response = handler.handle(chat_args, args);
 			results.push(response);
 		}
-		function handle_result(channelId, result) {
+		function handle_result(target, result) {
 			if (Array.isArray(result)) {
 				for (var key in result) {
 					var item = result[key];
-					handle_result(channelId, item);
+					handle_result(target, item);
 				}
 			}
 			else if (typeof(result) == typeof('')) {
 				 // Single message
-				 bot.sendMessage({
-					to: channelId,
-					message: result
-				});
+				 target.send(result);
 			}
 			else if (result != null) {
-				if (typeof(result) === typeof({}) && typeof(result.target) !== 'undefined') {
-					// An object with target/message
-					bot.sendMessage({
-						to: result.target,
-						message: result.message
-					});
+				const error_string = 'Only strings, arrays, objects of type TargetedMessage/Embed, or combinations are supported';
+				if (typeof(result) === typeof({})) {
+					var proto = result.constructor;
+					if (proto === TargetedMessage) {
+						// An object with target/message
+						handle_result(result.target, result.message);
+					}
+					else if (proto === discord.RichEmbed) {
+						target.send(result);
+					}
+					else {
+						// We have something confusing
+						logger.info('proto.name = ' + proto.name);
+						throw new Error(error_string);
+					}
 				}
 				else if (typeof(result) !== 'undefined') {
 					// We have something confusing
 					logger.info('typeof(result) = ' + typeof(result));
-					throw new Error('Only strings, arrays, objects of {target, message}, or combinations are supported');
+					throw new Error(error_string);
 				}
 			}
 		}
-		handle_result(data.channelId, results);
+		handle_result(data.evt.channel, results);
 	}
 
 	if (config.allow_crashing) {
@@ -116,17 +149,13 @@ bot.on('message', function (user, userId, channelId, message, evt) {
 		}
 		catch (err) {
 			if (config.send_crash_error_detail_to_channel) {
-				bot.sendMessage({
-					to: channelId,
-					message: 'FATAL BOT ERROR (' + err.name + '): ' + err.message
-				});
+				message.channel.send('FATAL BOT ERROR (' + err.name + '): ' + err.message);
 			}
 			else {
-				bot.sendMessage({
-					to: channelId,
-					message: 'A fatal error occurred with the command, please contact the maintainer of the bot'
-				});
+				message.channel.send('A fatal error occurred with the command, please contact the maintainer of the bot');
 			}
 		}
 	}
 });
+
+bot.login(auth.token);

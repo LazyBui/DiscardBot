@@ -44,8 +44,7 @@ class Util {
 				result += 'prop "' + val + '" - type "' + t + '" - val N/A';
 			}
 		}
-		Object.getOwnPropertyNames(obj).forEach(function (val, idx, array) {
-		});
+
 		return result;
 	}
 	static inspect_type(obj, indent) {
@@ -82,6 +81,11 @@ class Util {
 			}
 		});
 		return result;
+	}
+	static log_properties(obj) {
+		Object.getOwnPropertyNames(obj).forEach(function (val, idx, array) {
+			console.log('obj.' + val + ' = ' + obj[val]);
+		});
 	}
 };
 
