@@ -34,3 +34,6 @@ The commands used to produce the dependencies if you need to modify them.
 * `npm install bufferutil@3.0.5 uws@9.148.0 erlpack@discordapp/erlpack`
 * `npm install node-opus@0.2.9 opusscript@0.0.6 libsodium-wrappers@0.7.3`
 * `npm install discord.js winston fs path`
+
+# Notes
+Embeds are considered website previews, so make sure that you allow website previews in your local settings.
