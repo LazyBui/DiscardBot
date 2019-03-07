@@ -4,7 +4,7 @@ A basic Discord bot shell. Written for Node 10.15.1. May not be compatible with 
 # Installation commands
 You'll need to execute the following commands in the source directory to get this set up. The ordering is important.
 
-* First, open a PowerShell with administrator privileges. If you do not have PowerShell, install [https://visualstudio.microsoft.com/downloads/](Visual Studio Community) ([https://visualstudio.microsoft.com/vs/older-downloads/](Visual Studio Express 2015 for Windows Desktop) is recommended for Windows 7).
+* First, open a PowerShell with administrator privileges. If you do not have PowerShell, install [Visual Studio Community](https://visualstudio.microsoft.com/downloads/) ([Visual Studio Express 2015 for Windows Desktop](https://visualstudio.microsoft.com/vs/older-downloads/) is recommended for Windows 7).
 * `npm config set msvs_version 2015`
 * `npm install --global --production windows-build-tools`
 * `npm install --global node-gyp`
