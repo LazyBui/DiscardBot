@@ -3,6 +3,7 @@ const {transports, createLogger, format} = require('winston');
 const auth = require('./auth.js');
 const Handlers = require('./Handlers.js').Handlers;
 const ChatHandlerArgs = require('./ChatHandlerArgs.js').ChatHandlerArgs;
+const ImageMessage = require('./ImageMessage.js').ImageMessage;
 const TargetedMessage = require('./TargetedMessage.js').TargetedMessage;
 const Util = require('./Util.js').Util;
 
@@ -120,6 +121,9 @@ bot.on('message', function (message) {
 					if (proto === TargetedMessage) {
 						// An object with target/message
 						handle_result(result.target, result.message);
+					}
+					else if (proto === ImageMessage) {
+						target.send(result.text, { "files": [result.url] });
 					}
 					else if (proto === discord.RichEmbed) {
 						target.send(result);
