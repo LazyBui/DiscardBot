@@ -56,6 +56,15 @@ for (var key in Handlers) {
 	}
 }
 
+function catch_error(error, src) {
+	if (src) {
+		logger.error(src + ': ' + error);
+	}
+	else {
+		logger.error('Error: ' + error);
+	}
+}
+
 var bot = new discord.Client();
 
 bot.on('ready', function (evt) {
@@ -111,8 +120,10 @@ bot.on('message', function (message) {
 				}
 			}
 			else if (typeof(result) == typeof('')) {
-				 // Single message
-				 target.send(result);
+				// Single message
+				target.
+					send(result).
+					catch((error) => catch_error(error, 'Single message error handler'));
 			}
 			else if (result != null) {
 				const error_string = 'Only strings, arrays, objects of type TargetedMessage/Embed, or combinations are supported';
@@ -123,10 +134,14 @@ bot.on('message', function (message) {
 						handle_result(result.target, result.message);
 					}
 					else if (proto === ImageMessage) {
-						target.send(result.text, { "files": [result.url] });
+						target.
+							send(result.text, { "files": [result.url] }).
+							catch((error) => catch_error(error, 'ImageMessage error handler'));
 					}
 					else if (proto === discord.RichEmbed) {
-						target.send(result);
+						target.
+							send(result).
+							catch((error) => catch_error(error, 'RichEmbed error handler'));
 					}
 					else {
 						// We have something confusing
@@ -153,10 +168,14 @@ bot.on('message', function (message) {
 		}
 		catch (err) {
 			if (config.send_crash_error_detail_to_channel) {
-				message.channel.send('FATAL BOT ERROR (' + err.name + '): ' + err.message);
+				message.channel.
+					send('FATAL BOT ERROR (' + err.name + '): ' + err.message).
+					catch((error) => catch_error(error, 'Bot error handler'));
 			}
 			else {
-				message.channel.send('A fatal error occurred with the command, please contact the maintainer of the bot');
+				message.channel.
+					send('A fatal error occurred with the command, please contact the maintainer of the bot').
+					catch((error) => catch_error(error, 'Bot error handler'));
 			}
 		}
 	}
